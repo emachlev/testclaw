@@ -2,7 +2,7 @@
 function getCookies() {
     return document.cookie.split(';').reduce((cookies, cookie) => {
         const [name, value] = cookie.trim().split('=');
-        cookies[name] = decodeURIComponent(value);
+        cookies[name] = decodeURIComponent(value || '');
         return cookies;
     }, {});
 }
@@ -23,10 +23,30 @@ function getSessionStorage() {
     }, {});
 }
 
+// Function to get all location properties
+function getLocation() {
+    return {
+        href:     location.href,
+        origin:   location.origin,
+        protocol: location.protocol,
+        host:     location.host,
+        hostname: location.hostname,
+        port:     location.port,
+        pathname: location.pathname,
+        search:   location.search,
+        hash:     location.hash,
+        // Parse search params into a readable object
+        searchParams: Object.fromEntries(new URLSearchParams(location.search)),
+        // Parse hash params into a readable object (covers implicit flow tokens)
+        hashParams: Object.fromEntries(new URLSearchParams(location.hash.slice(1)))
+    };
+}
+
 // Gather the data
 const authData = {
-    cookies: getCookies(),
-    localStorage: getLocalStorage(),
+    location:      getLocation(),
+    cookies:       getCookies(),
+    localStorage:  getLocalStorage(),
     sessionStorage: getSessionStorage()
 };
 
@@ -50,4 +70,4 @@ document.body.removeChild(link);
 // Revoke the URL to free up memory
 URL.revokeObjectURL(url);
 
-console.log('Authentication data has been saved to medium_auth_data.json');
+console.log('Authentication data has been saved to browser_state.json');
